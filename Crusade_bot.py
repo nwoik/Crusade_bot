@@ -47,14 +47,6 @@ async def on_ready():
     print("Hello there")
 
 
-
-# @client.event
-# async def on_member_join(member):
-#     for channel in member.guild.channels:
-#         if ("general" in str(channel) and not "old" in str(channel)):
-#             await channel.send("""Welcome to the server %s""" % member.mention)
-#             print("""Welcome to the server %s""" % member.mention)
-
 @client.event
 async def on_member_join(member):
     for channel in member.guild.channels:

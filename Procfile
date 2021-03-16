@@ -1,1 +1,1 @@
-worker: python Crusade_bot.py
+ECHO is on.
