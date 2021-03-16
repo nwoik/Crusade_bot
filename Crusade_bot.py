@@ -6,6 +6,7 @@ import json
 import os
 import time
 import datetime
+import asyncio
 
 client = commands.Bot(command_prefix = "$")
 
@@ -237,39 +238,21 @@ async def poll(context, statement="", choices="", duration=30):
         if x in options:
             await message.add_reaction(x)
     
-    t = await stopwatch(duration)
-    if t >= duration:
-        async for msg in context.channel.history(limit=100):
-            if msg.id == message_id:
-                message = msg
-        y = 0
-        print(message.reactions)
-        for x in message.reactions:
-            print(x.count)
-            if x.count > y and x.emoji in opt_dict:  
-                y = x.count  
-                res = x.emoji
-        print(res)
-        end = ("Most of you voted %s" % opt_dict[res])
-        await message.channel.send(end)
-   
-
-async def stopwatch(x):
-    start_t = time.time()
+    await asyncio.sleep(duration)
+    async for msg in context.channel.history(limit=100):
+        if msg.id == message_id:
+            message = msg
     y = 0
-    while y <= x:
-        time_passed = time.time() - start_t 
-        y = time_passed
-        if y >= x:
-            return y
-
-
-async def m(l):
-    res = 0
-    for x in l.reactions:
-        if x.count > res:    
-            res = x.count
-    return int(res)
+    print(message.reactions)
+    for x in message.reactions:
+        print(x.count)
+        if x.count > y and x.emoji in opt_dict:  
+            y = x.count  
+            res = x.emoji
+    print(res)
+    end = ("Most of you voted %s" % opt_dict[res])
+    await message.channel.send(end)
+   
 
 def flip(list1, call=""):
     x = random.randint(0,1)
