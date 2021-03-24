@@ -142,7 +142,7 @@ async def mass_kick(context, role : discord.Role, guild_name=""):
 @commands.has_permissions(manage_messages=True)
 async def ban(context, member : discord.Member, reason=None):
     await member.ban(reason=reason)
-    await context.send("The heretic has been purged")
+    await context.send("https://tenor.com/view/bane-no-banned-and-you-are-explode-gif-16047504")
 
 @client.command()
 @commands.has_permissions(manage_messages=True)
