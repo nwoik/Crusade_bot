@@ -127,7 +127,7 @@ async def unshadowmute(context):
 @commands.has_permissions(manage_messages=True)
 async def kick(context, member : discord.Member):
     await member.kick()
-    await context.send("The heretic has been excommunicated")
+    await context.send("https://tenor.com/view/breakdance-kick-kid-gif-11600755")
 
 
 @client.command()
@@ -265,16 +265,11 @@ def flip(list1, call=""):
     else:
         return "You got %s" % list1[x]
 
+
 @client.command()
 async def coin(context, call=""):
     toss = flip(["heads", "tails"], call)
     await context.send(toss)
-
-@client.command()
-async def BASS(context):
-    reply = ["Send **BASS**", "I want to see your **BASS**", "Send me your **BASS** pics", "Your **BASS**, hand it over"]
-    x = random.randint(0,3)
-    await context.send("%s" % reply[x])
 
 @client.command()
 async def servers(context):
