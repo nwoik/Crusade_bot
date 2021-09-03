@@ -303,4 +303,5 @@ async def notify(context):
     f2.close()
     await context.send(res)
     
-client.run("NzAxODY0ODU2ODY5MTQyNzA4.XxmS6g.dqdI1IRkxyIqFJOtoFiKG_1rvJ4")
+my_key = os.environ["MY_KEY"]
+client.run(my_key)
