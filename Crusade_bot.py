@@ -10,40 +10,15 @@ import asyncio
 
 client = commands.Bot(command_prefix = "$")
 
-phrases = ["plugins suck", "plugins sucks", "plugins are kinda bad", "plugins are kind of bad",
-           "I hate plugins", "I don't like plugins", "I dont like plugins", "fuck plugins",
-           "plugins are shit", "plugins are kinda shit", "plugins are kind of shit", "plugins are bad"
-           "plugins are so bad", "plugins are so shit"]
-
-p_response = ["I could have you kicked for that kind of heresy", "**PUMPS SHOTGUN**", "**LOADS LMG WITH RELIGIOUS INTENT**", 
-              "That's heresy of the highest order", "Talking a lot of mad shit for someone in c$$shot distance", "You have mere seconds to live"]
-
-crusade = ["Did somebody say **CRUSADE!!!!!!!!!!**", "Did I just hear Crusade", "**HAPPY CRUSADE NOISES**", "It's Crusade time"]
-
 boomer_emotes = [":peteranderson:", ":goobleglurg:"]
-
-server_ids = {"sweepmanhq": {663787422559109130:[704756396230705284, 663787422559109133, 664594340714250252]}, "volaire":639302692476420146, "idontevenknowifweneedthis?":689860450048802823, "davidnwky'stestdummies":663787422559109130}
 
 shadow_muted = []
 
 polls = []
 
-@client.event 
-async def on_ready():
-    channel = client.get_channel(666264080813654025)
-    now = datetime.datetime.now()
-    day = datetime.datetime(2020, 12, 27, 22, 32, 00)
-    if now.date() == day.date():
-        print("yes")
-        f = open("Projects\ping.txt", "r")
-        fl = f.readlines()
-        for line in fl: 
-            await channel.send(line.strip("\n") + " Monster Hunter Worlds is free on the Epic store hurry!!!")
-            print(line.strip("\n") + " Monster Hunter Worlds is free on the Epic store hurry!!!")
-        f.close()  
-    else:
-        print("not yet")
 
+@client.event
+async def on_ready():
     await client.change_presence(status=discord.Status.online, activity=discord.Game("Crusade of the Analog lands"))
     print("Hello there")
 
@@ -56,72 +31,77 @@ async def on_member_join(member):
             print("""Welcome to the server %s""" % member.mention)
 
 @client.event
+async def on_reaction_add(reaction, user):
+    if reaction.message.author == client.user:
+        message = reaction.message   
+        for e in message.reactions:
+            if e.me == False:
+                await e.remove(user)
+
+@client.event
 async def on_message(message):
+    if type(message.channel) == discord.DMChannel:
+        print("(%s : %s): %s\n%s" % (message.author.name, message.author.mention, message.content, message.attachments))
+        BOT_DMS = await client.fetch_channel(857214111540314142)
+        await BOT_DMS.send("%s: %s\n%s" % (message.author.mention, message.content, message.attachments))
+
     if message.author == client.user:
         return
 
     if message.author in shadow_muted:
         await message.channel.purge(limit = 1)
 
-    # for phrase in phrases:
-    #     if phrase.lower() in message.content.lower():
-    #         response = random.choice(p_response)
-    #         await message.channel.send(response)
-    #         break
-
-    if "bro" in str(message.channel) and "bro" not in message.content.lower().strip(" "):
-        await message.channel.purge(limit = 1)
-
-    if "zeus" in str(message.channel) and ":zeuswut:" not in message.content.lower().strip(" ").strip(":"):
-        await message.channel.purge(limit = 1)
-
     if "slime" in message.content.lower().strip(" "):
         await message.channel.send("https://media.discordapp.net/attachments/728599009261781052/749299359946113164/Sprite-0001.gif")
 
-    if "Mage" in message.content.strip(" "):
+    if message.content.lower() == "mage":
         await message.channel.send("https://cdn.discordapp.com/attachments/728599009261781052/763876231824932874/Cloak.gif")
-
-    # if "crusade" in message.content.lower().strip(" "):
-    #     response = random.choice(crusade)
-    #     await message.channel.send(response)
 
     if "nigga" in message.content.lower().strip(" "):
         shadow_muted.append(message.author)
-        await message.channel.send("%s :eyes:" % message.author.mention)
-        
+        await message.channel.send("https://tenor.com/view/youremuted-gif-20283179")
+    
+    # await message.channel.send(message.author.mention + " " + str(message.content))
+
     await client.process_commands(message)
 
-# @client.event
-# async def on_member_update(before, after):
 
 @client.command()
 async def ping(context):
     await context.send(f"Pong! {round(client.latency * 1000)}ms")
+
 
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def clear(context, amount=1):
     await context.channel.purge(limit = amount+1)
 
+
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def shadowmute(context, member : discord.Member):
     guild = context.guild
-    if member.name == "davidnwky":
-        for x in guild.members:
-            shadow_muted.append(x)
-    else:
-        shadow_muted.append(member)
+    shadow_muted.append(member)
+    await context.send(member.mention + "\nhttps://tenor.com/view/youremuted-gif-20283179")
     print(shadow_muted)
+
 
 @client.command()
 @commands.has_permissions(manage_messages=True)
-async def unshadowmute(context):
+async def unshadowmute(context, member:discord.Member):
     if len(shadow_muted) != 0:
-        shadow_muted.pop()
-    else:
-        unshadowmute(context)
+        shadow_muted.remove(member)
+        await context.send(member.mention + " has been unmuted \nhttps://tenor.com/view/kars-unmuted-gif-19036031")
     print(shadow_muted)
+
+@client.command()
+async def gtfo_discord(context, time=1):
+    time = time*3600
+    shadow_muted.append(context.author)
+    await asyncio.sleep(time)
+    shadow_muted.remove(context.author)
+    await context.send("%s \nhttps://tenor.com/view/connor-mc-gregor-gtfo-gtfoh-get-the-fuck-out-of-here-gif-10203692" % context.author.mention)
+
 
 @client.command()
 @commands.has_permissions(manage_messages=True)
@@ -144,12 +124,12 @@ async def ban(context, member : discord.Member, reason=None):
     await member.ban(reason=reason)
     await context.send("https://tenor.com/view/bane-no-banned-and-you-are-explode-gif-16047504")
 
+
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def unban(context, member):
     banned_ppl = await context.guild.bans()
     member_name, member_disc = member.split("#")
-
     for x in banned_ppl:
         user = x.user    
         if (user.name, user.discriminator) == (member_name, member_disc):
@@ -160,22 +140,19 @@ async def unban(context, member):
 @client.command()
 async def member_count(context, server_name=""):
     guild = context.guild
-    if server_name == "":
-        s_id = client.get_guild(guild.id)
-    else:
-        s_id = client.get_guild(server_ids[server_name.lower().strip()])
+    await context.send("""```ini\n[Total members: %s]\n```""" % context.guild.member_count)
 
-    await context.send("""```ini\n[Total members: %s]\n```""" % s_id.member_count)
 
-# @client.command()
-# @commands.has_permissions(manage_messages=True)
-# async def say(context, guild_name="", channel_name="", msg=""):
-#     for guild in client.guilds:
-#         if guild_name in str(guild).lower():     
-#             for channel in guild.channels:              
-#                 if channel_name in str(channel):
-#                     await channel.send(msg)
-        
+@client.command()
+@commands.has_permissions(manage_messages=True)
+async def say(context, guild_name="", channel_name="", msg=""):
+    for guild in client.guilds:
+        if guild_name in str(guild).lower():     
+            for channel in guild.channels:              
+                if channel_name in str(channel):
+                    await channel.send(msg)    
+
+
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def guildinfo(context):
@@ -191,32 +168,32 @@ async def guildinfo(context):
     embed.set_footer(text="Requested by %s" % context.author, icon_url=context.author.avatar_url)
     await context.send(embed=embed)
 
+
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def member_info(context):
     guild = context.guild
-    role = discord.Role
-    print(list(role.members))
-    embed = discord.Embed(title="%s" % guild, description="Member Info", timestamp=context.message.created_at, color=discord.Color.blue())
+    embed = discord.Embed(title="%s" % guild, description="Member Info (Local)", timestamp=context.message.created_at, color=discord.Color.blue())
     embed.set_thumbnail(url=guild.icon_url)
+    for role in guild.roles:
+        embed.add_field(name=str(role.name), value=str(len(guild.get_role(role.id).members)), inline=False)
     embed.set_footer(text="Requested by %s" % context.author, icon_url=context.author.avatar_url)
     await context.send(embed=embed)
 
 
-
-@client.event
-async def on_reaction_add(reaction, user):
-    if reaction.message.author == client.user:
-        message = reaction.message   
-        for e in message.reactions:
-            if e.me == False:
-                await e.remove(user)
-    
+@client.command()
+@commands.has_permissions(manage_messages=True)
+async def role(context, member:discord.Member, rl):
+    for r in context.guild.roles:
+        if rl == r.name:
+            rl = r
+            print(r)
+    await member.add_roles(r)
+    await context.send(f"{member} has got the role {r}")
 
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def poll(context, statement="", choices="", duration=30):  
-
     numbers = {1:"1️⃣", 2:"2️⃣", 3:"3️⃣", 4:"4️⃣", 5:"5️⃣", 6:"6️⃣", 7:"7️⃣", 8:"8️⃣", 9:"9️⃣"}
     opt_dict = {}
     choices = choices.split("/")
@@ -231,7 +208,7 @@ async def poll(context, statement="", choices="", duration=30):
     embed.add_field(name="**Instructions**", value="React to cast a vote", inline=False)
     embed.set_footer(text="Requested by %s" % context.author, icon_url=context.author.avatar_url)
     await context.send("Cast your vote in the poll")
-    message = await context.send(embed=embed)  
+    message = await context.send(embed=embed)
     message_id = message.id
     print(opt_dict)
     for x in list(numbers.values()):
@@ -246,13 +223,27 @@ async def poll(context, statement="", choices="", duration=30):
     print(message.reactions)
     for x in message.reactions:
         print(x.count)
-        if x.count > y and x.emoji in opt_dict:  
-            y = x.count  
+        if x.count > y and x.emoji in opt_dict:
+            y = x.count
             res = x.emoji
     print(res)
     end = ("Most of you voted %s" % opt_dict[res])
     await message.channel.send(end)
-   
+
+
+@client.command()
+@commands.has_permissions(manage_messages=True)
+async def react(context, message_id, emoji):
+    message = await context.channel.fetch_message(int(message_id))
+    await message.add_reaction(emoji)
+
+
+@client.command()
+@commands.has_permissions(manage_messages=True)
+async def DM(context, user:discord.User, msg):
+    await user.send(msg)
+    print(msg)
+    return
 
 def flip(list1, call=""):
     x = random.randint(0,1)
@@ -280,28 +271,13 @@ async def servers(context):
     for guild in client.guilds:
         x += 1
         output += "%d. %s \n" % (x, guild)
-    embed.add_field(name="**Servers:**", value="%s" % output, inline=True) 
+    embed.add_field(name="**Servers:**", value="%s" % output, inline=True)
     embed.set_footer(text="Requested by %s" % context.author, icon_url=context.author.avatar_url)
-    await context.send(embed=embed)  
+    await context.send(embed=embed)
 
 @client.command()
 async def Gucci(context):
     await context.send("sup fellas! how r we all?")
-
-@client.command()
-async def notify(context):
-    text = "%s" % str(context.author.mention)
-    res = ""
-    f = open("Projects\ping.txt", "a")
-    f2 = open("Projects\ping.txt", "r")
-    if text not in f2.read():
-        res = "%s you've been notifed" % context.author.mention
-        f.write(text)
-    else:
-        res = "%s you've already been notifed" % context.author.mention
-    f.close()
-    f2.close()
-    await context.send(res)
     
 my_key = os.environ["MY_KEY"]
 client.run(my_key)
